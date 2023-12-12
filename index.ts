@@ -20,26 +20,7 @@ async function simulateSystem() {
             system.generateRandomTask(0.5); // Probability of 0.5
         }
     };
-
-    // Run FIFO algorithm
-    generateTasks(); // Populate task queue
-    await system.runFIFO();
-    system.displayStatus(simulationTime);
-    system.resetCompletedTasks(); // Reset for next algorithm
-
-    // Run Scheduler algorithm
-    generateTasks(); // Repopulate task queue
-    await system.runWithScheduler(1); // Assuming processor with ID 1 is the scheduler
-    system.displayStatus(simulationTime);
-    system.resetCompletedTasks(); // Reset for next algorithm
-
-    // Run Powerful Scheduler algorithm
-    generateTasks(); // Repopulate task queue
-    await system.runWithPowerfulScheduler();
-    system.displayStatus(simulationTime);
-    system.resetCompletedTasks(); // Reset for next algorithm
-
-    // ... additional algorithms ...
+    displayResults(system, simulationTime);
 }
 
 simulateSystem().catch(console.error);
@@ -60,7 +41,7 @@ function displayResults(system: System, simulationTime: number) {
 
     results.forEach(async ([name, runner]) => {
         await runner;
-        //system.displayStatus(simulationTime);
+        system.displayStatus(simulationTime);
         console.log(`| ${name.toString().padEnd(22)}| ${system.getCompletedTasks().toString().padEnd(35)}| ${system.getEfficiency(simulationTime).padEnd(12)}| ${system.getMaxPossibleTasks(simulationTime).toString().padEnd(41)}|`);
         system.resetCompletedTasks();
     });

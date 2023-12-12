@@ -42,46 +42,23 @@ function simulateSystem() {
     return __awaiter(this, void 0, void 0, function () {
         var processors, simulationTime, system, generateTasks;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    processors = [
-                        new Processor_1.Processor(1, 10),
-                        new Processor_1.Processor(2, 15),
-                        new Processor_1.Processor(3, 12),
-                        new Processor_1.Processor(4, 17),
-                        new Processor_1.Processor(5, 11),
-                        // ... other processors
-                    ];
-                    simulationTime = 10;
-                    system = new System_1.System(processors);
-                    generateTasks = function () {
-                        for (var i = 0; i < simulationTime * 1000; i++) {
-                            system.generateRandomTask(0.5); // Probability of 0.5
-                        }
-                    };
-                    // Run FIFO algorithm
-                    generateTasks(); // Populate task queue
-                    return [4 /*yield*/, system.runFIFO()];
-                case 1:
-                    _a.sent();
-                    system.displayStatus(simulationTime);
-                    system.resetCompletedTasks(); // Reset for next algorithm
-                    // Run Scheduler algorithm
-                    generateTasks(); // Repopulate task queue
-                    return [4 /*yield*/, system.runWithScheduler(1)];
-                case 2:
-                    _a.sent(); // Assuming processor with ID 1 is the scheduler
-                    system.displayStatus(simulationTime);
-                    system.resetCompletedTasks(); // Reset for next algorithm
-                    // Run Powerful Scheduler algorithm
-                    generateTasks(); // Repopulate task queue
-                    return [4 /*yield*/, system.runWithPowerfulScheduler()];
-                case 3:
-                    _a.sent();
-                    system.displayStatus(simulationTime);
-                    system.resetCompletedTasks(); // Reset for next algorithm
-                    return [2 /*return*/];
-            }
+            processors = [
+                new Processor_1.Processor(1, 10),
+                new Processor_1.Processor(2, 15),
+                new Processor_1.Processor(3, 12),
+                new Processor_1.Processor(4, 17),
+                new Processor_1.Processor(5, 11),
+                // ... other processors
+            ];
+            simulationTime = 10;
+            system = new System_1.System(processors);
+            generateTasks = function () {
+                for (var i = 0; i < simulationTime * 1000; i++) {
+                    system.generateRandomTask(0.5); // Probability of 0.5
+                }
+            };
+            displayResults(system, simulationTime);
+            return [2 /*return*/];
         });
     });
 }
@@ -106,7 +83,7 @@ function displayResults(system, simulationTime) {
                     case 0: return [4 /*yield*/, runner];
                     case 1:
                         _b.sent();
-                        //system.displayStatus(simulationTime);
+                        system.displayStatus(simulationTime);
                         console.log("| ".concat(name.toString().padEnd(22), "| ").concat(system.getCompletedTasks().toString().padEnd(35), "| ").concat(system.getEfficiency(simulationTime).padEnd(12), "| ").concat(system.getMaxPossibleTasks(simulationTime).toString().padEnd(41), "|"));
                         system.resetCompletedTasks();
                         return [2 /*return*/];

@@ -41,40 +41,35 @@ var DEFAULT_COMPLETION_TIME = 100; // Стандартний час викона
 function processTasksWithPowerfulScheduler(queue, processors) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var tasksProcessed, taskPromises, _loop_1, _i, queue_1, task;
+        var tasksProcessed, taskPromises, mostPowerfulProcessor, _loop_1, _i, queue_1, task;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     tasksProcessed = 0;
                     taskPromises = [];
+                    mostPowerfulProcessor = processors.reduce(function (a, b) { return a.power > b.power ? a : b; });
                     _loop_1 = function (task) {
-                        var mostPowerfulProcessor = processors.reduce(function (a, b) { return a.power > b.power ? a : b; });
-                        mostPowerfulProcessor.assignTask(); // This should ideally be a synchronous operation
-                        var availableProcessor = processors.find(function (p) { return task.processors.includes(p.id) && !p.isBusy; });
+                        var availableProcessor = processors.find(function (p) { return p !== mostPowerfulProcessor && !p.isBusy; });
                         if (availableProcessor) {
-                            availableProcessor.assignTask(); // Mark processor as busy
+                            availableProcessor.assignTask();
                             var completionTime_1 = (_a = task.estimatedCompletionTime) !== null && _a !== void 0 ? _a : DEFAULT_COMPLETION_TIME;
-                            var taskPromise = new Promise(function (resolve) {
-                                setTimeout(function () {
-                                    availableProcessor.completeTask(); // Mark processor as not busy
-                                    mostPowerfulProcessor.completeTask(); // Also complete the task on the powerful processor
-                                    tasksProcessed++;
-                                    resolve();
-                                }, completionTime_1);
-                            });
-                            taskPromises.push(taskPromise);
-                        }
-                        else {
-                            // If no processor is available, the most powerful processor should not assign the task
-                            mostPowerfulProcessor.completeTask();
+                            taskPromises.push(new Promise(function (resolve) { return setTimeout(function () {
+                                availableProcessor.completeTask();
+                                tasksProcessed++;
+                                resolve();
+                            }, completionTime_1); }));
                         }
                     };
                     for (_i = 0, queue_1 = queue; _i < queue_1.length; _i++) {
                         task = queue_1[_i];
                         _loop_1(task);
                     }
+                    // Periodically, the most powerful processor stops processing to manage the queue
+                    // ...
                     return [4 /*yield*/, Promise.all(taskPromises)];
                 case 1:
+                    // Periodically, the most powerful processor stops processing to manage the queue
+                    // ...
                     _b.sent();
                     return [2 /*return*/, tasksProcessed];
             }

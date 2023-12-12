@@ -41,18 +41,23 @@ var DEFAULT_COMPLETION_TIME = 100; // Стандартний час викона
 function processTasksWithScheduler(queue, processors, scheduler) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var tasksProcessed, processingPromises, _loop_1;
+        var tasksProcessed, taskPromises, workingProcessors, _loop_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     tasksProcessed = 0;
-                    processingPromises = [];
+                    taskPromises = [];
+                    workingProcessors = processors.filter(function (p) { return p !== scheduler; });
                     _loop_1 = function () {
+                        // Планировщик распределяет задачи
+                        scheduler.assignTask();
                         var task = queue.shift();
-                        var availableProcessor = processors.find(function (p) { return task.processors.includes(p.id) && !p.isBusy; });
+                        // Находим доступный процессор для задачи
+                        var availableProcessor = workingProcessors.find(function (p) { return !p.isBusy; });
                         if (availableProcessor) {
                             availableProcessor.assignTask();
                             var completionTime_1 = (_a = task.estimatedCompletionTime) !== null && _a !== void 0 ? _a : DEFAULT_COMPLETION_TIME;
+                            // Создаем промис для обработки задачи
                             var processingPromise = new Promise(function (resolve) {
                                 setTimeout(function () {
                                     availableProcessor.completeTask();
@@ -60,14 +65,18 @@ function processTasksWithScheduler(queue, processors, scheduler) {
                                     resolve();
                                 }, completionTime_1);
                             });
-                            processingPromises.push(processingPromise);
+                            taskPromises.push(processingPromise);
                         }
+                        // Планировщик завершает распределение текущей задачи
+                        scheduler.completeTask();
                     };
                     while (queue.length > 0) {
                         _loop_1();
                     }
-                    return [4 /*yield*/, Promise.all(processingPromises)];
+                    // Ожидаем завершения всех задач
+                    return [4 /*yield*/, Promise.all(taskPromises)];
                 case 1:
+                    // Ожидаем завершения всех задач
                     _b.sent();
                     return [2 /*return*/, tasksProcessed];
             }

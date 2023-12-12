@@ -47,20 +47,16 @@ function processTasksFIFO(queue, processors) {
                 case 0:
                     tasksProcessed = 0;
                     taskPromises = [];
-                    console.log('1');
                     _loop_1 = function (task) {
-                        var availableProcessor = processors.find(function (p) { return task.processors.includes(p.id) && !p.isBusy; });
+                        var availableProcessor = processors.find(function (p) { return !p.isBusy; });
                         if (availableProcessor) {
                             availableProcessor.assignTask();
                             var completionTime_1 = (_a = task.estimatedCompletionTime) !== null && _a !== void 0 ? _a : DEFAULT_COMPLETION_TIME;
-                            var taskPromise = new Promise(function (resolve) {
-                                setTimeout(function () {
-                                    availableProcessor.completeTask();
-                                    tasksProcessed++;
-                                    resolve();
-                                }, completionTime_1 * 100);
-                            });
-                            taskPromises.push(taskPromise);
+                            taskPromises.push(new Promise(function (resolve) { return setTimeout(function () {
+                                availableProcessor.completeTask();
+                                tasksProcessed++;
+                                resolve();
+                            }, completionTime_1); }));
                         }
                     };
                     for (_i = 0, queue_1 = queue; _i < queue_1.length; _i++) {
